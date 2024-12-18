@@ -28,8 +28,6 @@ def extract_max_cost(input_string):
         return None  # Return None if no digits are found
 
 def commit(body_text, is_amazon, chaotic):
-    max_cost = extract_max_cost(st.session_state[key_gift_concept]['cost'])
-
     used_names = []
     i = 0
     receivers = list(st.session_state[key_participants].keys())
@@ -37,13 +35,14 @@ def commit(body_text, is_amazon, chaotic):
     for name, email in st.session_state[key_participants].items():
         while True:
             if receivers[i] not in used_names and receivers[i] != name:
-                message = f"""Subject: Super Friend Secret Santa Extravaganza!
+                message = f"""Subject: Secret Santa Extravaganza!
 
 Hi {name}! You are {receivers[i]}'s Secret Santa :D                
 {body_text}
 """
                 if is_amazon:
-                    link = amazon_link(st.session_state[key_gift_concept]['gift_concept'], max_cost, chaotic)
+                    max_cost = extract_max_cost(st.session_state[key_gift_concept].get('cost', ''))
+                    link = amazon_link(st.session_state[key_gift_concept].get('gift_concept', ''), max_cost, chaotic)
                     message += f"\nAmazon Link for a random item meeting the theme and cost needs!:\n{link}"
                 Send_Email.send_email_button(message, email)
                 used_names.append(receivers[i])
@@ -56,19 +55,19 @@ def create_default_message():
     gift_concept = st.session_state[key_gift_concept]
     default_message = f"""
 Gift Theme: 
-{gift_concept['gift_concept']}
+{gift_concept.get('gift_concept')}
 
 Cost:
-Under {gift_concept['cost']}
+Under {gift_concept.get('cost')}
 
 Location:
-{gift_concept['location']}
+{gift_concept.get('location')}
 
 Date:
-{gift_concept['date']}
+{gift_concept.get('date')}
 
 Time:
-{gift_concept['time']}
+{gift_concept.get('time')}
     """
     return default_message
 
@@ -81,13 +80,18 @@ def amazon_link(theme, max_cost, chaotic):
     else:
         keywords = theme
     price_max = max_cost
+    price_min = price_max
+    if price_min is None:
+        price_min = 0
+    else:
+        price_min /= 2
     random_page = random.randint(1, 10)  # Random page number (1-10)
 
     # Amazon search query structure
     params = {
         "k": keywords,  # Search keywords
         "s": "price-asc-rank",  # Sort by price (ascending)
-        "low-price": price_max/2,  # Min price
+        "low-price": price_min,  # Min price
         "high-price": price_max,  # Max price
         "page": random_page,  # Random page to simulate randomness
         "i": "aps"  # 'aps' means 'All Products' to avoid apps/videos
