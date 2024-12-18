@@ -3,6 +3,7 @@ import Send_Email
 import streamlit as st
 import urllib.parse
 import re
+import streamlit.components.v1 as components
 
 key_gift_concept = 'gift_concept'
 key_participants = 'participants'
@@ -17,6 +18,17 @@ if key_output_participants not in st.session_state:
     st.session_state[key_output_participants] = {}
 if key_output_finish not in st.session_state:
     st.session_state[key_output_finish] = ''
+
+# ad_code = """
+# <ins class="adsbygoogle"
+#      style="display:block"
+#      data-ad-client="ca-pub-1830894284968587"
+#      data-ad-slot="yyyyyyyyyy"
+#      data-ad-format="auto"></ins>
+# <script>
+#      (adsbygoogle = window.adsbygoogle || []).push({});
+# </script>
+# """
 
 def extract_max_cost(input_string):
     # Use regex to find digits in the string
@@ -119,6 +131,11 @@ st.markdown("""
                 #MainMenu {visibility: hidden;}
         </style>
         """, unsafe_allow_html=True)
+
+st.title(":red[Secret Santa Extravaganza]")
+st.write(":blue[Setup your secret santa below. Once you have added participants you will be able to create a message for your email to everyone.]" +
+         ":blue[Once you hit 'send' everyone will get an email from secret.santa.extravaganza@gmail.com with a random participant name and no duplicates!]")
+st.write(' ')
 
 st.subheader(":green[Main Secret Santa Input]")
 
